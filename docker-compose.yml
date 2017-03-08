@@ -70,6 +70,19 @@ services:
       - MYSQL_PASSWORD=magento2
       - TERM=meh
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: m2docker_phpmyadmin
+    environment:
+     - PMA_HOST=db
+    restart: always
+    links:
+      - db
+    ports:
+     - "8080:80"
+    volumes:
+     - /sessions
+
   cli:
     hostname: cli.magento2.docker
     image: meanbee/magento2-php:7.0-cli
