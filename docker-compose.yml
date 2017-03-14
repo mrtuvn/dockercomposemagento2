@@ -3,15 +3,20 @@ services:
   varnish:
     image: meanbee/magento2-varnish:latest
     environment:
-      - VIRTUAL_HOST=magento2.docker
-      - VIRTUAL_PORT=80
+      #- VIRTUAL_HOST=magento2.docker
+      #- VIRTUAL_PORT=80
       - HTTPS_METHOD=noredirect
+      - CACHE_SIZE=256M
     volumes:
+      - ./varnish/etc/varnish/:/etc/default/varnish/
       - ./varnish/etc/varnish.vcl:/data/varnish.vcl
     depends_on:
-      - "web"
-    #ports:
-      #- 80
+      - web
+    links:
+      - web
+    ports:
+      #- "80:80"
+      - "6081:6081"
 
   web:
     image: meanbee/magento2-nginx:1.9
@@ -24,13 +29,15 @@ services:
     depends_on:
       - fpm
       - db
+    #volumes:
+      #- ./nginx/etc/default:/etc/nginx/sites-available/default
     volumes_from:
       - appdata
     env_file:
       - ./global.env
     #environment:
       #- VIRTUAL_HOST=magento2.docker
-      #- VIRTUAL_PORT=8080
+      #- VIRTUAL_PORT=80
       #- HTTPS_METHOD=noredirect
 
   redis:
@@ -86,6 +93,8 @@ services:
   cli:
     hostname: cli.magento2.docker
     image: meanbee/magento2-php:7.0-cli
+    #build:
+      #context: 7.0-cli/
     links:
       - db
     volumes:
@@ -103,9 +112,9 @@ services:
       - M2SETUP_DB_PASSWORD=magento2
       - M2SETUP_BASE_URL=http://magento2.docker/
       - M2SETUP_BACKEND_FRONTNAME=admin
-      - M2SETUP_ADMIN_FIRSTNAME=Admin
-      - M2SETUP_ADMIN_LASTNAME=User
-      - M2SETUP_ADMIN_EMAIL=dummy@gmail.com
+      - M2SETUP_ADMIN_FIRSTNAME=Tu
+      - M2SETUP_ADMIN_LASTNAME=Nguyen
+      - M2SETUP_ADMIN_EMAIL=admin@gmail.com
       - M2SETUP_ADMIN_USER=admin
       - M2SETUP_ADMIN_PASSWORD=123123q
       - M2SETUP_VERSION=2.1.*
@@ -123,9 +132,11 @@ services:
       - db
 
   appdata:
+    container_name: m1_data
     image: tianon/true
     volumes:
       - ./magento:/var/www/magento
+      #- ./nginx/etc/nginx.conf:/etc/nginx/conf.d/default.conf
 
   dbdata:
     image: tianon/true

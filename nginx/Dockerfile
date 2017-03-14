@@ -6,7 +6,7 @@ ADD etc/vhost.conf /etc/nginx/conf.d/default.conf
 ADD bin/* /usr/local/bin/
 
 ENV FPM_HOST fpm
-ENV FPM_PORT 9001
+ENV FPM_PORT 9000
 ENV MAGENTO_ROOT /var/www/magento
 ENV MAGENTO_RUN_MODE developer
 ENV DEBUG false
