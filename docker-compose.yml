@@ -1,27 +1,41 @@
 version: "2"
 services:
   varnish:
-    image: meanbee/magento2-varnish:latest
+    #image: fballiano/varnish
+    build:
+      context: varnish/
     environment:
-      #- VIRTUAL_HOST=magento2.docker
-      #- VIRTUAL_PORT=80
+      - VIRTUAL_HOST=magento2.docker
+      - VIRTUAL_PORT=80
       - HTTPS_METHOD=noredirect
-      - CACHE_SIZE=256M
-    volumes:
-      - ./varnish/etc/varnish/:/etc/default/varnish/
-      - ./varnish/etc/varnish.vcl:/data/varnish.vcl
+      #- CACHE_SIZE=256M
+    #volumes:
+      #- ./varnish/etc/varnish/:/etc/default/varnish/
+      #- ./varnish/etc/varnish.vcl:/data/varnish.vcl
+    ports:
+      - 80
     depends_on:
       - web
     links:
       - web
-    ports:
-      #- "80:80"
-      - "6081:6081"
+
+  #ssl:
+    #image: fballiano/nginx-ssl-for-magento2
+    #depends_on:
+      #- web
+    #links:
+      #- web
+    #ports:
+      #- "443:443"
 
   web:
     image: meanbee/magento2-nginx:1.9
+    container_name: m2docker_nginx
+    #build:
+      #context: nginx/
     ports:
-      - "80:80"
+      - 8080
+      - 443
     links:
       - fpm
       - redis
@@ -30,7 +44,7 @@ services:
       - fpm
       - db
     #volumes:
-      #- ./nginx/etc/default:/etc/nginx/sites-available/default
+      #- ./nginx/etc/default.conf:/etc/nginx/conf.d/default.conf
     volumes_from:
       - appdata
     env_file:
@@ -44,7 +58,7 @@ services:
     restart: always
     image: redis:3.0.7
     ports:
-      - 6379
+      - "6379:6379"
 
   rabbit:
     restart: always
@@ -86,7 +100,7 @@ services:
     links:
       - db
     ports:
-     - "8080:80"
+     - "8082:8080"
     volumes:
      - /sessions
 
@@ -120,25 +134,25 @@ services:
       - M2SETUP_VERSION=2.1.*
       - M2SETUP_USE_SAMPLE_DATA=true
 
-  cron:
-    image: meanbee/magento2-php:7.0-cli
-    hostname: magento2-cron.docker
-    command: run-cron
-    environment:
-      - ENABLE_SENDMAIL=true
-    volumes_from:
-      - appdata
-    links:
-      - db
+  #cron:
+    #image: meanbee/magento2-php:7.0-cli
+    #hostname: magento2-cron.docker
+    #command: run-cron
+    #environment:
+      #- ENABLE_SENDMAIL=true
+    #volumes_from:
+      #- appdata
+    #links:
+      #- db
 
   appdata:
-    container_name: m1_data
+    container_name: m2docker_data
     image: tianon/true
     volumes:
       - ./magento:/var/www/magento
-      #- ./nginx/etc/nginx.conf:/etc/nginx/conf.d/default.conf
-
+      
   dbdata:
+    container_name: m2docker_dbdata
     image: tianon/true
     volumes:
       - /var/lib/mysql
