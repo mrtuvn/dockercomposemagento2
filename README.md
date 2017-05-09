@@ -2,6 +2,15 @@
 
 A collection of Docker images for running Magento 2 through nginx and on the command line.
 
+## Stack
+ Varnish
+ Redis
+ PHP7
+ RabbitMQ (Message queue)
+ MariaDB
+ Nginx 1.9
+ Phpmyadmin
+
 ## Quick Start
 
     cp composer.env.sample composer.env
