@@ -19,8 +19,17 @@ A collection of Docker images for running Magento 2 through nginx and on the com
     mkdir magento
 
     docker-compose run cli magento-installer //Install magento core
-    docker-compose up -d
+    docker-compose up --build // Re-build containers with log view
+    docker-compose up -d // run all containers with background-mode (no log)
     docker-compose restart
+
+## Fix permissions on virtual-machine and real-host dir
+
+  sudo chown -R $USER: ./magento //magento is directory contain magento core sources mounted from virtual-machine
+
+  Goto vm by command docker-compose run cli bash
+
+  fix permission: cd /var/www/magento && sudo find var vendor pub/static pub/media app/etc -type f -exec chmod g+w {} \; && sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} \; && sudo chown -R :www-data . && sudo chmod u+x bin/magento
 
 ## Configuration
 
