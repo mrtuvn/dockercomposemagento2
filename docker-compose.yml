@@ -52,7 +52,7 @@ services:
     volumes_from:
       - dbdata
     environment:
-      - MYSQL_ROOT_PASSWORD=magento2
+      - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=magento2
       - MYSQL_USER=magento2
       - MYSQL_PASSWORD=magento2
