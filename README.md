@@ -4,11 +4,17 @@ A collection of Docker images for running Magento 2 through nginx and on the com
 
 ## Stack
  Varnish
+
  Redis
+
  PHP7
+
  RabbitMQ (Message queue)
+
  MariaDB
- Nginx 1.9
+
+ Nginx
+
  Phpmyadmin
 
 ## Quick Start
@@ -29,7 +35,9 @@ A collection of Docker images for running Magento 2 through nginx and on the com
 
   Goto vm by command docker-compose run cli bash
 
-  fix permission: cd /var/www/magento && sudo find var vendor pub/static pub/media app/etc -type f -exec chmod g+w {} \; && sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} \; && sudo chown -R :www-data . && sudo chmod u+x bin/magento
+  fix permission: 
+
+cd /var/www/magento && sudo find var vendor pub/static pub/media app/etc -type f -exec chmod g+w {} \; && sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} \; && sudo chown -R :www-data . && sudo chmod u+x bin/magento
 
 ## Configuration
 
