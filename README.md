@@ -9,7 +9,7 @@ A collection of Docker images for running Magento 2 through nginx and on the com
 
     mkdir magento
 
-    docker-compose run cli magento-installer
+    docker-compose run cli magento-installer //Install magento core
     docker-compose up -d
     docker-compose restart
 

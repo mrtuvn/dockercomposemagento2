@@ -2,22 +2,23 @@ vcl 4.0;
 
 import std;
 # The minimal Varnish version is 4.0
-# For SSL offloading, pass the following header in your proxy server or load balancer: 'X-Forwarded-Proto: https'
+# For SSL offloading, pass the following header in your proxy server or load balancer: 'SSL-OFFLOADED: https'
 
 backend default {
     .host = "web";
-    .port = "8080";
-}
-
-acl purge {
-    "web";
+    .port = "80";
 }
 
 sub vcl_recv {
+
+    # Ensure the true IP is sent onwards.
+    # This was an issue getting xdebug working through varnish
+    # whilst having a proxy infront of varnish (for local docker dev)
+    if (req.http.X-Real-Ip) {
+        set req.http.X-Forwarded-For = req.http.X-Real-Ip;
+    }
+
     if (req.method == "PURGE") {
-        if (client.ip !~ purge) {
-            return (synth(405, "Method not allowed"));
-        }
         if (!req.http.X-Magento-Tags-Pattern) {
             return (synth(400, "X-Magento-Tags-Pattern header required"));
         }
@@ -75,7 +76,7 @@ sub vcl_recv {
     # static files are always cacheable. remove SSL flag and cookie
         if (req.url ~ "^/(pub/)?(media|static)/.*\.(ico|css|js|jpg|jpeg|png|gif|tiff|bmp|mp3|ogg|svg|swf|woff|woff2|eot|ttf|otf)$") {
         unset req.http.Https;
-        unset req.http.X-Forwarded-Proto;
+        unset req.http.SSL-OFFLOADED;
         unset req.http.Cookie;
     }
 
@@ -95,10 +96,10 @@ sub vcl_hash {
     }
 
     # To make sure http users don't see ssl warning
-    if (req.http.X-Forwarded-Proto) {
-        hash_data(req.http.X-Forwarded-Proto);
+    if (req.http.SSL-OFFLOADED) {
+        hash_data(req.http.SSL-OFFLOADED);
     }
-    
+
 }
 
 sub vcl_backend_response {
